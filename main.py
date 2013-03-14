@@ -75,5 +75,3 @@ class twitchchannelinfo():
         return self.dict1 ['url']
     def getdisplayname(self):
         return self.dict1 ['display_name']
-
-t = TwitchingWrapper('2z8qndwhjih2gch7x9g1yqj4hjcitnt')
