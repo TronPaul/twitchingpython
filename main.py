@@ -21,12 +21,8 @@ class TwitchingWrapper():
         else:
             pass
 
-    def getblocklist(self,limit = None):
-        if limit == None:
-            params = {}
-        else:
-            params = {'limit':self.limit}
-        
+    def getblocklist(self,limit):
+        params = {'limit':limit}
         dict1 = json.loads(requests.get(baseurl + 'users/' + self.name + '/blocks', headers = self.headers,params = params).text)
         return dict1
         
@@ -39,7 +35,31 @@ class TwitchingWrapper():
     def getchannelinfo(self):
         dict1 = json.loads(requests.get(baseurl + 'channel',headers = self.headers).text)
         return dict1
-        
+    
+    def getchanneleditors(self,channel):
+        dict1 = json.loads(requests.get(baseurl + 'channels/' + channel +'/editors', headers = self.headers).text)
+        return dict1
+    
+    def getchannelfollowers(self,channel):
+        dict1 = json.loads(requests.get(baseurl + 'channels/' + channel +'/follows', headers = self.headers).text)
+        return dict1
+    
+    def getchannelvideos(self,channel):
+        dict1 = json.loads(requests.get(baseurl + 'channels/' + channel +'/videos', headers = self.headers).text)
+        return dict1
+    
+    def updatechannel(self,channel,status,game):
+        params = {'status':status,'game':game}
+        requests.put(baseurl + 'channels/' + channel, headers = self.headers, params = params)
+    
+    def startcommercial(self,length,channel):
+        parms = {'channel_commercial':length}
+        requests.post(baseurl + 'channels/' + channel + '/commercial', headers = self.headers, parms = parms)
+    
+    def resetstreamkey(self,channel):
+        requests.delete(baseurl + 'channels/' + channel + '/stream_key', headers = self.headers)
+             
+    
 class twitchchannelinfo():
     def __init__ (self,channel):
         self.channel = channel
