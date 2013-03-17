@@ -12,14 +12,19 @@ waittime = 1
 baseurl = 'https://api.twitch.tv/kraken/'
 
 class TwitchingWrapper():
-    def __init__(self,token):
-        if not isinstance(token, str) or not token:
-            raise Exception
-        self.headers = {'Authorization':'OAuth ' + token}
-        dict1  = requests.get(baseurl + 'user', headers = self.headers)
-        dict1.raise_for_status()
-        self.dict1 = json.loads(dict1.text)
-        self.name = self.dict1 ['name']
+    def __init__(self,token = None):
+        if token == None:
+            self.headers = None
+            self.name = None
+        else:
+            if not isinstance(token, str) or not token:
+                raise Exception
+            self.headers = {'Authorization':'OAuth ' + token}
+            time.sleep(waittime)
+            dict1  = requests.get(baseurl + 'user', headers = self.headers)
+            dict1.raise_for_status()
+            dict1 = json.loads(dict1.text)
+            self.name = dict1 ['name']
 
     def getblocklist(self,limit):
         if not isinstance(limit, int) or not limit:
@@ -42,11 +47,19 @@ class TwitchingWrapper():
         time.sleep(waittime)
         requests.delete(baseurl + 'users/' + self.name + '/blocks/' + target, headers = self.headers).raise_for_status()
                
-    def getchannelinfo(self):
-        time.sleep(waittime)
-        dict1 = requests.get(baseurl + 'channel',headers = self.headers)
-        dict1.raise_for_status()
-        return json.loads(dict1.text)
+    def getchannelinfo(self,channel = None):
+        if channel == None:
+            time.sleep(waittime)
+            dict1 = requests.get(baseurl + 'channel', headers = self.headers)
+            dict1.raise_for_status()
+            return json.loads(dict1.text)
+        else:
+            if not isinstance(channel, str) or not channel:
+                raise Exception
+            time.sleep(waittime)
+            dict1 = requests.get(baseurl + 'channels/' + channel, headers = self.headers)
+            dict1.raise_for_status()
+            return json.loads(dict1.text)    
     
     def getchanneleditors(self,channel):
         if not isinstance(channel, str) or not channel:
@@ -97,41 +110,3 @@ class TwitchingWrapper():
             raise Exception
         time.sleep(waittime)
         requests.delete(baseurl + 'channels/' + channel + '/stream_key', headers = self.headers).raise_for_status()
-    
-class twitchchannelinfo():
-    def __init__ (self,channel):
-        self.channel = channel
-        time.sleep(waittime)
-        dict1 = requests.get(baseurl + 'channels/' + channel)
-        dict1.raise_for_status()
-        self.dict1 = json.loads(dict1.text)
-    def getname(self):
-        return self.dict1 ['name']
-    def getgame(self):
-        return self.dict1 ['game']
-    def getcreated(self):
-        return self.dict1 ['created_at']
-    def getteams(self):
-        return self.dict1 ['teams']
-    def gettitle(self):
-        return self.dict1 ['title']
-    def getupdateat(self):
-        return self.dict1 ['updated_at']
-    def getbanner(self):
-        return self.dict1 ['banner']
-    def getvideobanner(self):
-        return self.dict1 ['video_banner']
-    def getbackground(self):
-        return self.dict1 ['background']
-    def getlinks(self):
-        return self.dict1 ['_links']
-    def getlogo(self):
-        return self.dict1 ['logo']
-    def getid(self):
-        return self.dict1 ['_id']
-    def getmature(self):
-        return self.dict1 ['mature']
-    def getchanurl(self):
-        return self.dict1 ['url']
-    def getdisplayname(self):
-        return self.dict1 ['display_name']
