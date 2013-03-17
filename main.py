@@ -16,55 +16,73 @@ class TwitchingWrapper():
         self.token = token
         if self.token != None:
             self.headers = {'Authorization':'OAuth ' + token}
-            self.dict1 = json.loads(requests.get(baseurl + 'user', headers = self.headers).text)
+            dict1  = requests.get(baseurl + 'user', headers = self.headers)
+            dict1.raise_for_status()
+            self.dict1 = json.loads(dict1.text)
             self.name = self.dict1 ['name']
         else:
             pass
 
     def getblocklist(self,limit):
         params = {'limit':limit}
-        dict1 = json.loads(requests.get(baseurl + 'users/' + self.name + '/blocks', headers = self.headers,params = params).text)
-        return dict1
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'users/' + self.name + '/blocks', headers = self.headers,params = params)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
         
     def putblocklist(self,target):
-        requests.put(baseurl + 'users/' + self.name + '/blocks/' + target,headers = self.headers)
+        time.sleep(waittime)
+        requests.put(baseurl + 'users/' + self.name + '/blocks/' + target,headers = self.headers).raise_for_status()
         
     def deleteblocklist(self,target):
-        requests.delete(baseurl + 'users/' + self.name + '/blocks/' + target,headers = self.headers)
+        time.sleep(waittime)
+        requests.delete(baseurl + 'users/' + self.name + '/blocks/' + target,headers = self.headers).raise_for_status()
                
     def getchannelinfo(self):
-        dict1 = json.loads(requests.get(baseurl + 'channel',headers = self.headers).text)
-        return dict1
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'channel',headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
     
     def getchanneleditors(self,channel):
-        dict1 = json.loads(requests.get(baseurl + 'channels/' + channel +'/editors', headers = self.headers).text)
-        return dict1
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'channels/' + channel +'/editors', headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
     
     def getchannelfollowers(self,channel):
-        dict1 = json.loads(requests.get(baseurl + 'channels/' + channel +'/follows', headers = self.headers).text)
-        return dict1
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'channels/' + channel +'/follows', headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
     
     def getchannelvideos(self,channel):
-        dict1 = json.loads(requests.get(baseurl + 'channels/' + channel +'/videos', headers = self.headers).text)
-        return dict1
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'channels/' + channel +'/videos', headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
     
     def updatechannel(self,channel,status,game):
         params = {'status':status,'game':game}
-        requests.put(baseurl + 'channels/' + channel, headers = self.headers, params = params)
+        time.sleep(waittime)
+        requests.put(baseurl + 'channels/' + channel, headers = self.headers, params = params).raise_for_status()
     
     def startcommercial(self,length,channel):
         parms = {'channel_commercial':length}
-        requests.post(baseurl + 'channels/' + channel + '/commercial', headers = self.headers, parms = parms)
+        time.sleep(waittime)
+        requests.post(baseurl + 'channels/' + channel + '/commercial', headers = self.headers, parms = parms).raise_for_status()
     
     def resetstreamkey(self,channel):
-        requests.delete(baseurl + 'channels/' + channel + '/stream_key', headers = self.headers)
-             
+        time.sleep(waittime)
+        requests.delete(baseurl + 'channels/' + channel + '/stream_key', headers = self.headers).raise_for_status()
     
 class twitchchannelinfo():
     def __init__ (self,channel):
         self.channel = channel
         time.sleep(waittime)
-        self.dict1 = json.loads(requests.get(baseurl + 'channels/' + channel).text)
+        dict1 = requests.get(baseurl + 'channels/' + channel)
+        dict1.raise_for_status()
+        self.dict1 = json.loads(dict1.text)
     def getname(self):
         return self.dict1 ['name']
     def getgame(self):
