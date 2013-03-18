@@ -127,6 +127,7 @@ def gettokenweb():
                     "+user_blocks_read" +
                     "+channel_read"
                     )
+                    
     return (urlparse(raw_input('Enter the url: ')).fragment).split("&")[0][13:] 
 
 def gettoken():
