@@ -168,5 +168,3 @@ def checkint(intger):
             return intger
     else:
             return intger
-
-t = TwitchingWrapper(gettoken())
