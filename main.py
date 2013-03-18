@@ -112,21 +112,21 @@ def gettokenweb():
     import webbrowser
     from urlparse import urlparse
     webbrowser.open(
-'https://api.twitch.tv/kraken/oauth2/authorize\
-?response_type=token\
-&client_id=3kfp6al05voejvv7ofmpc94g4jga0tb\
-&redirect_uri=http://httpbin.org/\
-&scope=user_read\
-+user_blocks_edit\
-+user_follows_edit\
-+channel_editor\
-+channel_commercial\
-+channel_stream\
-+channel_subscriptions\
-+channel_check_subscription\
-+user_blocks_read\
-+channel_read'
-)
+                    "https://api.twitch.tv/kraken/oauth2/authorize" +
+                    "?response_type=token" +
+                    "&client_id=3kfp6al05voejvv7ofmpc94g4jga0tb" +
+                    "&redirect_uri=http://httpbin.org/" +
+                    "&scope=user_read" +
+                    "+user_blocks_edit" +
+                    "+user_follows_edit" +
+                    "+channel_editor" +
+                    "+channel_commercial" +
+                    "+channel_stream" +
+                    "+channel_subscriptions" +
+                    "+channel_check_subscription" +
+                    "+user_blocks_read" +
+                    "+channel_read"
+                    )
     return (urlparse(raw_input('Enter the url: ')).fragment).split("&")[0][13:] 
 
 def gettoken():
