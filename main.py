@@ -34,12 +34,12 @@ class TwitchingWrapper():
         return json.loads(dict1.text)
         
     def putblocklist(self,target):
-        checkstring(target)
+        target = checkstring(target)
         time.sleep(waittime)
         requests.put(baseurl + 'users/' + self.name + '/blocks/' + target, headers = self.headers).raise_for_status()
         
     def deleteblocklist(self,target):
-        checkstring(target)
+        target = checkstring(target)
         time.sleep(waittime)
         requests.delete(baseurl + 'users/' + self.name + '/blocks/' + target, headers = self.headers).raise_for_status()
                
@@ -50,56 +50,56 @@ class TwitchingWrapper():
             dict1.raise_for_status()
             return json.loads(dict1.text)
         else:
-            checkstring(channel)
+            channel = checkstring(channel)
             time.sleep(waittime)
             dict1 = requests.get(baseurl + 'channels/' + channel, headers = self.headers)
             dict1.raise_for_status()
             return json.loads(dict1.text)    
     
     def getchanneleditors(self,channel):
-        checkstring(channel)
+        channel = checkstring(channel)
         time.sleep(waittime)
         dict1 = requests.get(baseurl + 'channels/' + channel +'/editors', headers = self.headers)
         dict1.raise_for_status()
         return json.loads(dict1.text)
     
     def getchannelfollowers(self,channel):
-        checkstring(channel)
+        channel = checkstring(channel)
         time.sleep(waittime)
         dict1 = requests.get(baseurl + 'channels/' + channel +'/follows', headers = self.headers)
         dict1.raise_for_status()
         return json.loads(dict1.text)
     
     def getchannelvideos(self,channel):
-        checkstring(channel)
+        channel = checkstring(channel)
         time.sleep(waittime)
         dict1 = requests.get(baseurl + 'channels/' + channel +'/videos', headers = self.headers)
         dict1.raise_for_status()
         return json.loads(dict1.text)
     
     def updatechannel(self,channel,status,game):
-        checkstring(channel)
-        checkstring(status)
-        checkstring(game)
+        channel = checkstring(channel)
+        status = checkstring(status)
+        game = checkstring(game)
         params = {'status':status,'game':game}
         time.sleep(waittime)
         requests.put(baseurl + 'channels/' + channel, headers = self.headers, params = params).raise_for_status()
     
     def startcommercial(self,length,channel):
         length = checkint(length)
-        checkstring(channel)
+        channel = checkstring(channel)
         parms = {'channel_commercial':length}
         time.sleep(waittime)
         requests.post(baseurl + 'channels/' + channel + '/commercial', headers = self.headers, parms = parms).raise_for_status()
     
     def resetstreamkey(self,channel):
-        checkstring(channel)
+        channel = checkstring(channel)
         time.sleep(waittime)
         requests.delete(baseurl + 'channels/' + channel + '/stream_key', headers = self.headers).raise_for_status()
     
  
 def checktoken(token):
-    checkstring(token)
+    token = checkstring(token)
     headers = {'Authorization':'OAuth ' + token,'Accept':'application/vnd.twitchtv.v2+json'}
     time.sleep(waittime)
     dict1 = requests.get(baseurl + 'user', headers = headers)
@@ -127,15 +127,36 @@ def gettokenweb():
                     "+user_blocks_read" +
                     "+channel_read"
                     )
-                    
-    return (urlparse(raw_input('Enter the url: ')).fragment).split("&")[0][13:] 
+    return (urlparse(raw_input('Enter the url:')).fragment).split("&")[0][13:] 
 
 def gettoken():
-    pass #Need to be implemented
-
+    tokenfile = open("tokendata.dat", "r+")
+    spot = tokenfile.read()
+    if checktoken(spot):
+        validtoken = spot
+    else:
+        validtoken = None
+           
+    if validtoken == None:
+        tokenfile = open("tokendata.dat", "a+")
+        import os
+        webtoken = gettokenweb()
+        tokenfile.write(webtoken + os.linesep)
+        return webtoken
+    else:
+        return validtoken
+        
 def checkstring(string):
     if not isinstance(string, str) or not string:
-        raise Exception
+        try:
+            string = str(string)
+        except:
+            raise Exception
+        else:
+            return string
+    else:
+        return string
+    
 
 def checkint(intger):
     if not isinstance(intger, int) or not intger:
@@ -147,3 +168,5 @@ def checkint(intger):
             return intger
     else:
             return intger
+
+t = TwitchingWrapper(gettoken())
