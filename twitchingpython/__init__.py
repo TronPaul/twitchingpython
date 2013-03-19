@@ -132,18 +132,18 @@ def gettokenweb():
 def gettoken():
     import os
     os.close(os.open("tokendata.dat",os.O_CREAT))
-    tokenfile = open("tokendata.dat", "r+")
-    spot = tokenfile.read()
-    if checktoken(spot):
-        validtoken = spot
-    else:
-        validtoken = None
+    with open("tokendata.dat", "r+") as tokenfile:
+        spot = tokenfile.read()
+        if checktoken(spot):
+            validtoken = spot
+        else:
+            validtoken = None
            
     if validtoken == None:
-        tokenfile = open("tokendata.dat", "a+")
-        webtoken = gettokenweb()
-        tokenfile.write(webtoken + os.linesep)
-        return webtoken
+        with open("tokendata.dat", "a+") as tokenfile:
+            webtoken = gettokenweb()
+            tokenfile.write(webtoken + os.linesep)
+            return webtoken
     else:
         return validtoken
         
