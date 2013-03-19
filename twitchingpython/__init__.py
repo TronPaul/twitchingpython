@@ -70,12 +70,22 @@ class TwitchingWrapper():
         dict1.raise_for_status()
         return json.loads(dict1.text)
     
-    def getchannelvideos(self,channel):
-        channel = checkstring(channel)
+    def getchannelvideos(self,limit = 25,offset = 0,broadcasts = False,channel = None):
+        limit = checkint(limit)
+        offset = checkint(offset)
+        broadcasts = bool(broadcasts)
         time.sleep(waittime)
-        dict1 = requests.get(baseurl + 'channels/' + channel +'/videos', headers = self.headers)
-        dict1.raise_for_status()
-        return json.loads(dict1.text)
+        params = {"limit":limit,"offset":offset,"broadcasts":broadcasts}
+        if channel == None:
+            dict1 = requests.get(baseurl + 'channels/' + self.name + '/videos', headers = self.headers, params = params)
+            dict1.raise_for_status()     
+            return json.loads(dict1.text)       
+        else:
+            channel = checkstr(channel)
+            dict1 = requests.get(baseurl + 'channels/' + channel +'/videos', headers = self.headers, params = params)
+            dict1.raise_for_status()
+            return json.loads(dict1.text)
+        
     
     def updatechannel(self,channel,status,game):
         channel = checkstring(channel)
@@ -97,7 +107,7 @@ class TwitchingWrapper():
         time.sleep(waittime)
         requests.delete(baseurl + 'channels/' + channel + '/stream_key', headers = self.headers).raise_for_status()
     
- 
+
 def checktoken(token):
     token = checkstring(token)
     headers = {'Authorization':'OAuth ' + token,'Accept':'application/vnd.twitchtv.v2+json'}
