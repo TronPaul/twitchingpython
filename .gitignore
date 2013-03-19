@@ -36,4 +36,4 @@ nosetests.xml
 .pydevproject
 
 # Data
-tokendata.dat
+*.dat
