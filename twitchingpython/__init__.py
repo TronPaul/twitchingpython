@@ -390,6 +390,3 @@ def checkint(intger):
         raise errors.InvalidInput
     else:
         return intger
-    
-c = Channel(gettoken())
-print c.getchannelinfo()
