@@ -24,10 +24,11 @@ class TwitchingWrapper():
             self.name = json.loads(dict1.text) ['name']
         else:
             raise Exception
-
-    def getblocklist(self,limit):
-        limit = checkint(limit)                
-        params = {'limit':limit}
+    
+    def getblocklist(self,limit = 25,offset = 0):
+        limit = checkint(limit) 
+        offset = checkint(offset)
+        params = {'limit':limit,"offset":offset}
         time.sleep(waittime)
         dict1 = requests.get(baseurl + 'users/' + self.name + '/blocks', headers = self.headers,params = params)
         dict1.raise_for_status()
@@ -56,10 +57,10 @@ class TwitchingWrapper():
             dict1.raise_for_status()
             return json.loads(dict1.text)    
     
-    def getchanneleditors(self,channel):
+    def getchannelvideos(self,channel):
         channel = checkstring(channel)
         time.sleep(waittime)
-        dict1 = requests.get(baseurl + 'channels/' + channel +'/editors', headers = self.headers)
+        dict1 = requests.get(baseurl + 'channels/' + channel +'/videos', headers = self.headers)
         dict1.raise_for_status()
         return json.loads(dict1.text)
     
@@ -67,6 +68,13 @@ class TwitchingWrapper():
         channel = checkstring(channel)
         time.sleep(waittime)
         dict1 = requests.get(baseurl + 'channels/' + channel +'/follows', headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def getchanneleditors(self,channel):
+        channel = checkstring(channel)
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'channels/' + channel +'/editors', headers = self.headers)
         dict1.raise_for_status()
         return json.loads(dict1.text)
     
@@ -95,6 +103,11 @@ class TwitchingWrapper():
         time.sleep(waittime)
         requests.put(baseurl + 'channels/' + channel, headers = self.headers, params = params).raise_for_status()
     
+    def resetstreamkey(self,channel):
+        channel = checkstring(channel)
+        time.sleep(waittime)
+        requests.delete(baseurl + 'channels/' + channel + '/stream_key', headers = self.headers).raise_for_status()
+    
     def startcommercial(self,length,channel):
         length = checkint(length)
         channel = checkstring(channel)
@@ -102,10 +115,167 @@ class TwitchingWrapper():
         time.sleep(waittime)
         requests.post(baseurl + 'channels/' + channel + '/commercial', headers = self.headers, parms = parms).raise_for_status()
     
-    def resetstreamkey(self,channel):
-        channel = checkstring(channel)
+    def getchannelfollowers(self,channel,limit = 25,offset = 0):
+        limit = checkint(limit)
+        offset = checkint(offset)
+        channel = checkstr(channel)
+        params = {"limit":limit,"offset":offset}
         time.sleep(waittime)
-        requests.delete(baseurl + 'channels/' + channel + '/stream_key', headers = self.headers).raise_for_status()
+        dict1 = requests.get(baseurl + 'channels/' + channel + '/follows', headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def getchannelfollowing(self,limit = 25,offset = 0):
+        limit = checkint(limit)
+        offset = checkint(offset)
+        params = {"limit":limit,"offset":offset}
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'users/' + self.name + '/follows/channels', headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def follow(self,target):
+        target = checkstr(target)
+        time.sleep(waittime)
+        dict1 = requests.put(baseurl + 'users/' + self.name + '/follows/channels/' + target, headers = self.headers).raise_for_status()
+        
+    def unfollow(self,target):
+        target = checkstr(target)
+        time.sleep(waittime)
+        dict1 = requests.delete(baseurl + 'users/' + self.name + '/follows/channels/' + target, headers = self.headers).raise_for_status()
+        
+    def gettopgames(self,limit = 25,offset = 0):
+        limit = checkint(limit)
+        offset = checkint(offset)
+        params = {"limit":limit,"offset":offset}
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "games/top", headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def getingests(self):
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "ingests/", headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+        
+    def gettokeninfo(self):
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl, headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def searchstreams(self,query,limit = 25,offset = 0):
+        query = checkstr(query)
+        limit = checkint(limit)
+        offset = checkint(offset)
+        parms = {"query":query,"limit":limit,"offset":offset}
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "search/streams", parms = parms, headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def searchgames(self,query,type,live = False):
+        query = checkstr(query)
+        type = checkstr(type)
+        live = bool(live)
+        parms = {"query":query,"type":type,"live":live}
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "search/games", parms = parms, headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+        
+    def getstream(self,channel):
+        channel = checkstr(channel)
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "streams/" + channel, headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def getstreams(self,game,channel,limit = 25,offset = 0,embeddable = False,hls = False):
+        game = checkstr(game)
+        channel = checkstr(channel)
+        limit = checkint(limit)
+        offset = checkint(offset)
+        embeddable = bool(embeddable)
+        hls = bool(hls)
+        parms = {"game":game,"channel":channel,"limit":limit,"offset":offset,"embeddable":embeddable,"hls":hls}
+        time.sleep(time.waittime)
+        dict1 = requests.get(baseurl + "streams/", headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def getfeaturedstreams(self,limit = 25,offset = 0,hls = False):
+        limit = checkint(limit)
+        offset = checkint(offset)
+        hls = bool(hls)
+        parms = {"limit":limit,"offset":offset,"hls":hls}
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "streams/featured", headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def getstreamsummary(self,limit = 25,offset = 0,hls = False):
+        limit = checkint(limit)
+        offset = checkint(offset)
+        hls = bool(hls)     
+        parms = {"limit":limit,"offset":offset,"hls":hls}     
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "streams/summary", headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def getstreamsfollowing(self):
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "streams/followed", headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+        
+    def getsubscribers(self,channel,limit = 25, offset = 0,direction = "asc"):
+        channel = checkstr(channel)
+        limit = checkint(limit)
+        offset = checkint(offset)
+        direction = checkstr(direction)
+        parms = {"limit":limit,"offset":offset,"direction":direction}
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "channels/" + channel + "/subscriptions", headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)        
+    
+    def checksubscription (self,channel,user):
+        channel = checkstr(channel)
+        user = checkstr(user)
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "channels/" + channel + "/subscriptions/" + user, headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)        
+    
+    def getteams(self):
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "teams/", headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def getteaminfo(self,team):
+        team = checkstr(team)
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "teams/" + team, headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+        
+    def getuserinfo(self,user):
+        user = checkstr(user)
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "users/" + user, headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def getvideoinfo(self,id):
+        id = checkstr(id)
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "videos/" + id, headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
     
 
 def checktoken(token):
@@ -158,24 +328,18 @@ def gettoken():
         return validtoken
         
 def checkstring(string):
-    if not isinstance(string, str) or not string:
-        try:
-            string = str(string)
-        except:
-            raise Exception
-        else:
-            return string
+    try:
+        string = str(string)
+    except:
+        raise errors.InvalidInput
     else:
         return string
     
 
 def checkint(intger):
-    if not isinstance(intger, int) or not intger:
-        try:
-            intger = int(intger)
-        except:
-            raise Exception
-        else:
-            return intger
+    try:
+        intger = int(intger)
+    except:
+        raise errors.InvalidInput
     else:
-            return intger
+        return intger
