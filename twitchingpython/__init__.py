@@ -14,9 +14,11 @@ baseurl = 'https://api.twitch.tv/kraken/'
 class TwitchingWrapper():
     def __init__(self,token = None):
         if token == None:
+            self.token = token
             self.headers = {'Accept':'application/vnd.twitchtv.v2+json'}
             self.name = None
         elif checktoken(token):
+            self.token = token
             self.headers = {'Authorization':'OAuth ' + token,'Accept':'application/vnd.twitchtv.v2+json'}
             time.sleep(waittime)
             dict1 = requests.get(baseurl + 'user', headers = self.headers)
@@ -24,7 +26,10 @@ class TwitchingWrapper():
             self.name = json.loads(dict1.text) ['name']
         else:
             raise Exception
-    
+        
+    def returnauthtoken(self):
+        return self.token
+       
     def getblocklist(self,limit = 25,offset = 0):
         limit = checkint(limit) 
         offset = checkint(offset)
@@ -278,6 +283,48 @@ class TwitchingWrapper():
         return json.loads(dict1.text)
     
 
+
+class Channel():
+    def __init__(self,token = None,channel = None):
+        if token != None and checktoken(token):
+            self.headers = {"Authorization":"OAuth " + token,"Accept":"application/vnd.twitchtv.v2+json"}
+            time.sleep(waittime)
+            dict1 = requests.get(baseurl + "user", headers = self.headers)
+            dict1.raise_for_status()
+            self.channel = json.loads(dict1.text) ["name"]
+            self.authed = True
+        elif channel != None:
+            channel = checksrt(channel)
+            self.channel = channel
+            self.headers = {"Accept":"application/vnd.twitchtv.v2+json"}
+            self.authed = False
+        else:
+            raise Exception
+    
+    def getchannelinfo(self):
+        if self.authed:
+            time.sleep(waittime)
+            dict1 = requests.get(baseurl + "channel/", headers = self.headers)
+            dict1.raise_for_status()
+            return json.loads(dict1.text)   
+        elif not self.authed:
+            time.sleep(waittime)
+            dict1 = requests.get(baseurl + 'channels/' + self.channel, headers = self.headers)
+            dict1.raise_for_status()
+            return json.loads(dict1.text)               
+        
+    def getchannelvideos(self, limit = 25, offset = 0, broadcasts = False):
+        limit = checkint(limit)
+        offset = checkint(offset)
+        broadcasts = bool(broadcasts)
+        parms = {"limit":limit, "offset":offset, "broadcasts":broadcasts}
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'channels/' + self.channel +'/videos', headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    
+     
 def checktoken(token):
     token = checkstring(token)
     headers = {'Authorization':'OAuth ' + token,'Accept':'application/vnd.twitchtv.v2+json'}
@@ -343,3 +390,6 @@ def checkint(intger):
         raise errors.InvalidInput
     else:
         return intger
+    
+c = Channel(gettoken())
+print c.getchannelinfo()
