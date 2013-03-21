@@ -130,7 +130,7 @@ class TwitchingWrapper():
         dict1.raise_for_status()
         return json.loads(dict1.text)
     
-    def getchannelfollowing(self,limit = 25,offset = 0):
+    def getusefollowing(self,limit = 25,offset = 0):
         limit = checkint(limit)
         offset = checkint(offset)
         params = {"limit":limit,"offset":offset}
@@ -283,20 +283,20 @@ class TwitchingWrapper():
         return json.loads(dict1.text)
     
 
-
 class Channel():
     def __init__(self,token = None,channel = None):
         if token != None and checktoken(token):
             self.headers = {"Authorization":"OAuth " + token,"Accept":"application/vnd.twitchtv.v2+json"}
             time.sleep(waittime)
-            dict1 = requests.get(baseurl + "user", headers = self.headers)
+            dict1 = requests.get(baseurl, headers = self.headers)
             dict1.raise_for_status()
-            self.channel = json.loads(dict1.text) ["name"]
+            self.channel = json.loads(dict1.text) ["token"] ["user_name"] 
+            self.scope = json.loads(dict1.text) ["token"] ["authorization"] ["scopes"]
             self.authed = True
         elif channel != None:
-            channel = checksrt(channel)
-            self.channel = channel
+            self.channel = checksrt(channel)
             self.headers = {"Accept":"application/vnd.twitchtv.v2+json"}
+            self.scope = None
             self.authed = False
         else:
             raise Exception
@@ -311,7 +311,7 @@ class Channel():
             time.sleep(waittime)
             dict1 = requests.get(baseurl + 'channels/' + self.channel, headers = self.headers)
             dict1.raise_for_status()
-            return json.loads(dict1.text)               
+            return json.loads(dict1.text)
         
     def getchannelvideos(self, limit = 25, offset = 0, broadcasts = False):
         limit = checkint(limit)
@@ -323,8 +323,60 @@ class Channel():
         dict1.raise_for_status()
         return json.loads(dict1.text)
     
+    def getchannelfollowers(self,limit = 25, offset = 0):
+        limit = checkint(limit)
+        offset = checkint(offset)
+        parms = {"limit":limit,"offset":offset}
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'channels/' + self.channel +'/follows', headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
     
-     
+    def getchanneleditors(self):
+        if channel_read not in self.scope:
+            raise HigherScopeRequired ("channel_read")
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + 'channels/' + self.channel +'/editors', headers = self.headers)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+    
+    def updatechannel(self,status,game):
+        if channel_editor not in self.scope:
+            raise HigherScopeRequired ("channel_editor")
+        status = checkstring(status)
+        game = checkstring(game)
+        params = {'status':status,'game':game}
+        time.sleep(waittime)
+        requests.put(baseurl + 'channels/' + self.channel, headers = self.headers, params = params).raise_for_status()
+        
+    def resetstreamkey(self):
+        if channel_stream not in self.scope:
+            raise HigherScopeRequired ("channel_stream")
+        time.sleep(waittime)
+        requests.delete(baseurl + 'channels/' + self.channel + '/stream_key', headers = self.headers).raise_for_status()
+        
+    def startcommercial(self,length):
+        if channel_commercial not in self.scope:
+            raise HigherScopeRequired ("channel_commercial")
+        length = checkint(length)
+        parms = {'channel_commercial':length}
+        time.sleep(waittime)
+        requests.post(baseurl + 'channels/' + self.channel + '/commercial', headers = self.headers, parms = parms).raise_for_status()
+    
+    def getsubscribers(self,limit = 25, offset = 0, direction = "asc"):
+        if channel_subscriptions not in self.scope:
+            raise HigherScopeRequired ("channel_subscriptions")
+        limit = checkint(limit)
+        offset = checkint(offset)
+        direction = checkstr(direction)
+        parms = {"limit":limit,"offset":offset,"direction":direction}
+        time.sleep(waittime)
+        dict1 = requests.get(baseurl + "/channels/" + self.channel + "/subscriptions", headers = self.headers, parms = parms)
+        dict1.raise_for_status()
+        return json.loads(dict1.text)
+        
+                
+        
 def checktoken(token):
     token = checkstring(token)
     headers = {'Authorization':'OAuth ' + token,'Accept':'application/vnd.twitchtv.v2+json'}
