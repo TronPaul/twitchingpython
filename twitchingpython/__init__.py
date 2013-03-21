@@ -334,7 +334,7 @@ class Channel():
     
     def getchanneleditors(self):
         if channel_read not in self.scope:
-            raise HigherScopeRequired ("channel_read")
+            raise errors.HigherScopeRequired ("channel_read")
         time.sleep(waittime)
         dict1 = requests.get(baseurl + 'channels/' + self.channel +'/editors', headers = self.headers)
         dict1.raise_for_status()
@@ -342,7 +342,7 @@ class Channel():
     
     def updatechannel(self,status,game):
         if channel_editor not in self.scope:
-            raise HigherScopeRequired ("channel_editor")
+            raise errors.HigherScopeRequired ("channel_editor")
         status = checkstring(status)
         game = checkstring(game)
         params = {'status':status,'game':game}
@@ -351,13 +351,13 @@ class Channel():
         
     def resetstreamkey(self):
         if channel_stream not in self.scope:
-            raise HigherScopeRequired ("channel_stream")
+            raise errors.HigherScopeRequired ("channel_stream")
         time.sleep(waittime)
         requests.delete(baseurl + 'channels/' + self.channel + '/stream_key', headers = self.headers).raise_for_status()
         
     def startcommercial(self,length):
         if channel_commercial not in self.scope:
-            raise HigherScopeRequired ("channel_commercial")
+            raise errors.HigherScopeRequired ("channel_commercial")
         length = checkint(length)
         parms = {'channel_commercial':length}
         time.sleep(waittime)
@@ -365,7 +365,7 @@ class Channel():
     
     def getsubscribers(self,limit = 25, offset = 0, direction = "asc"):
         if channel_subscriptions not in self.scope:
-            raise HigherScopeRequired ("channel_subscriptions")
+            raise errors.HigherScopeRequired ("channel_subscriptions")
         limit = checkint(limit)
         offset = checkint(offset)
         direction = checkstr(direction)
